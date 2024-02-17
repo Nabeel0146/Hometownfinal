@@ -28,7 +28,13 @@ class MyApp extends StatelessWidget {
         // state is not lost during the reload. To reset the state, use hot
         // restart instead.
         //hellloooooo
-        //
+        //git config --global user.name "John Doe"git config --global user.email "johndoe@email.com"
+
+
+
+
+
+        
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
