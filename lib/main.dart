@@ -1,28 +1,29 @@
+import 'package:apptest/Ecommerce/ecommerce.dart';
+import 'package:apptest/Social%20Media/socialmedia.dart';
 import 'package:apptest/homepage.dart';
+import 'package:apptest/profile/profile_page.dart';
+import 'package:apptest/servicess/service_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-//hellooo
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // helloooiiiii
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo222',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomePage(),
+        '/service': (context) => ServicePage(),
+        '/ecommerce': (context) => ECommercePage(),
+        '/social_media': (context) => SocialMediaPage(),
+        '/profile': (context) => ProfilePage(),
+      },
       theme: ThemeData(
-        //hellooo hiindndndndndnd
-        //vannkkkkkk
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const Homepage(),
     );
   }
 }
-
-

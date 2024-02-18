@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class SocialMediaPage extends StatelessWidget {
+class ServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Social Media Page'),
+        title: Text(''),
       ),
       body: Center(
-        child: Text('Social Media Page Content'),
+        child: Text('Service Page Content'),
       ),
     );
   }
