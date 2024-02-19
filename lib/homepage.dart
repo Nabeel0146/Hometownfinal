@@ -48,6 +48,11 @@ class _HomePageState extends State<HomePage> {
             label: 'E-commerce',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.black,
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.group),
             label: 'Social Media',
           ),
