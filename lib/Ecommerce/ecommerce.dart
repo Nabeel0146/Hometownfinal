@@ -11,9 +11,7 @@ class EcommercePage extends StatelessWidget {
       ),
       body: Center(
         child: Text('E-commerce Page Content'),
-      ),
-    return const Center(
-      child: Text('Ecommerce Content'),
-    );
+      ));
+    
   }
 }
