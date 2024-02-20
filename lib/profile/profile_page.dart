@@ -7,9 +7,7 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Profile Page'),
       ),
-      body: Center(
-        child: Text('Profile Page Content'),
-      ),
+      body: Text('Profile Page Content'),
     );
   }
 }

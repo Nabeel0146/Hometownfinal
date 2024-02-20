@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> {
     
     ServicePage(),
     ECommercePage(),
+
     SocialMediaPage(),
     ProfilePage(),
   ];
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Pageeee'),
+        title: const Text('Home Town'),
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
