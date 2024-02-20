@@ -1,17 +1,14 @@
-import 'package:apptest/Ecommerce/ecommerce.dart';
-import 'package:apptest/homepage.dart';
-import 'package:apptest/profile/profile.dart';
-import 'package:apptest/servicess/services.dart';
 import 'package:flutter/material.dart';
-import 'package:apptest/Social%20Media/socialmedia.dart';
 
 
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
@@ -28,6 +25,8 @@ class MyApp extends StatelessWidget {
 
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -43,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Image.asset("lib/images/hometownlogo.png",width: 35,height: 35, ),
             
-            Text('Home Town', ),
+            const Text('Home Town', ),
           ],
         ),
       ),
@@ -57,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   _currentIndex = index;
                 });
               },
-              children: [
+              children: const [
                 SocialMediaPage(),
                 ServicesPage(),
                 HomePage(),
@@ -71,11 +70,11 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: (index) {
               _pageController.animateToPage(
                 index,
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
               );
             },
-            items: [
+            items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.group),
                 label: 'Social Media',
@@ -110,45 +109,55 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class SocialMediaPage extends StatelessWidget {
+  const SocialMediaPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Social Media Content'),
     );
   }
 }
 
 class ServicesPage extends StatelessWidget {
+  const ServicesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Services Content'),
     );
   }
 }
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Home Content'),
     );
   }
 }
 
 class EcommercePage extends StatelessWidget {
+  const EcommercePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Ecommerce Content'),
     );
   }
 }
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Profile Content'),
     );
   }
