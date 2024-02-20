@@ -1,16 +1,11 @@
-
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class ServicesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Home Content',),
       
+      child: Text('Services Content'),
     );
   }
 }
-
-
-
-
