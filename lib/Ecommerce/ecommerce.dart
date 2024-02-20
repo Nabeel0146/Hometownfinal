@@ -5,6 +5,13 @@ class EcommercePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+       // title: Text('E-commerce Page'),
+      ),
+      body: Center(
+        child: Text('E-commerce Page Content'),
+      ),
     return const Center(
       child: Text('Ecommerce Content'),
     );
