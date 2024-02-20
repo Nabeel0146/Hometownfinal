@@ -5,7 +5,7 @@ class ECommercePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('E-commerce Page'),
+       // title: Text('E-commerce Page'),
       ),
       body: Center(
         child: Text('E-commerce Page Content'),

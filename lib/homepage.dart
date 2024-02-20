@@ -15,9 +15,9 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    
     ServicePage(),
     ECommercePage(),
+    HomePage(),
     SocialMediaPage(),
     ProfilePage(),
   ];
@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Pageeee'),
+        title: const Text('Home Page'),
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -36,8 +36,7 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = index;
           });
         },
-        items:  [
-          
+        items: [
           BottomNavigationBarItem(
             backgroundColor: Colors.black,
             icon: Icon(Icons.work),
@@ -53,10 +52,12 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.black,
             icon: Icon(Icons.group),
             label: 'Social Media',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.black,
             icon: Icon(Icons.person),
             label: 'Profile',
           ),
