@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     ServicePage(),
     ECommercePage(),
-    //HomePage(),
+    const HomePage(),
     SocialMediaPage(),
     ProfilePage(),
   ];
@@ -26,11 +26,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: const Text('Home Page'),
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: 4,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
