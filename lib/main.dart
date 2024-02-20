@@ -1,4 +1,7 @@
+import 'package:apptest/Ecommerce/ecommerce.dart';
 import 'package:apptest/firebase_options.dart';
+import 'package:apptest/profile/profile.dart';
+import 'package:apptest/servicess/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -36,8 +39,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
-  final PageController _pageController = PageController();
+  int _currentIndex = 2;
+  final PageController _pageController = PageController(initialPage: 2);
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset("lib/images/hometownlogo.png",width: 35,height: 35, ),
-            
+           Image.network("https://raw.githubusercontent.com/Nabeel0146/Hometown-project-images/main/hometownlogo.png", width: 35, height: 35,),
             const Text('Home Town', ),
           ],
         ),
@@ -124,16 +126,7 @@ class SocialMediaPage extends StatelessWidget {
   }
 }
 
-class ServicesPage extends StatelessWidget {
-  const ServicesPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Services Content'),
-    );
-  }
-}
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -146,24 +139,5 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class EcommercePage extends StatelessWidget {
-  const EcommercePage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Ecommerce Content'),
-    );
-  }
-}
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Profile Content'),
-    );
-  }
-}
