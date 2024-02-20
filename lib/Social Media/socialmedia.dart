@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Simple Social Media Page',
+      title: '',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -36,7 +36,7 @@ class _SocialMediaPageState extends State<SocialMediaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Social Media Page'),
+        title: Text(''),
       ),
       body: Column(
         children: [
