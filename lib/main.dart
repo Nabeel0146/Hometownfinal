@@ -1,7 +1,6 @@
 import 'package:apptest/Ecommerce/ecommerce.dart';
 import 'package:apptest/firebase_options.dart';
-import 'package:apptest/profile/profile.dart';
-import 'package:apptest/servicess/services.dart';
+import 'package:apptest/servicess/Services/servicespage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -39,8 +38,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 2;
-  final PageController _pageController = PageController(initialPage: 2);
+  int _currentIndex = 0;
+  final PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               children: const [
                 SocialMediaPage(),
-                ServicesPage(),
+                Servicespage(),
                 HomePage(),
                 EcommercePage(),
                 ProfilePage(),
@@ -141,3 +140,13 @@ class HomePage extends StatelessWidget {
 
 
 
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('Profile Content'),
+    );
+  }
+}
