@@ -49,6 +49,7 @@ class EcommercePage extends StatelessWidget {
   }
 }
 
+
 class ShopProfilePage extends StatelessWidget {
   final String shopId;
 
@@ -60,79 +61,125 @@ class ShopProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Shop Profile'),
       ),
-      body: Column(
-        children: [
-          // Display Shop Information
-          StreamBuilder(
-  stream: FirebaseFirestore.instance.collection('shops').doc(shopId).snapshots(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return CircularProgressIndicator();
-    }
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Display Shop Information
+            StreamBuilder(
+              stream: FirebaseFirestore.instance.collection('shops').doc(shopId).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
 
-    if (snapshot.hasError) {
-      return Text('Error: ${snapshot.error}');
-    }
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
 
-    // Perform a null check before accessing data
-    var shop = snapshot.data as DocumentSnapshot<Map<String, dynamic>>?;
-    if (shop == null || !shop.exists) {
-      return Text('Shop not found');
-    }
+                // Perform a null check before accessing data
+                var shop = snapshot.data as DocumentSnapshot<Map<String, dynamic>>?;
+                if (shop == null || !shop.exists) {
+                  return Text('Shop not found');
+                }
 
-    // Access shop data safely
-    var shopData = shop.data();
+                // Access shop data safely
+                var shopData = shop.data();
 
-    return Column(
-      children: [
-        // Display Shop Information
-        Text('Shop Name: ${shopData?['name']}'),
-        Text('Category: ${shopData?['category']}'),
-        // Add other relevant shop information here
-      ],
-    );
-  },
-),
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Shop Name: ${shopData?['name']}',
+                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text('Category: ${shopData?['category']}'),
+                      // Add other relevant shop information here
+                    ],
+                  ),
+                );
+              },
+            ),
 
-          // Display Products Grid
-          StreamBuilder(
-  stream: FirebaseFirestore.instance.collection('products').where('shopId', isEqualTo: shopId).snapshots(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const CircularProgressIndicator();
-    }
+            // Display Products List
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Products',
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+            ),
 
-    if (snapshot.hasError) {
-      return Text('Error: ${snapshot.error}');
-    }
+            StreamBuilder(
+              stream: FirebaseFirestore.instance.collection('products').where('shopId', isEqualTo: shopId).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
 
-    // Perform a null check before accessing docs
-    var products = (snapshot.data as QuerySnapshot<Map<String, dynamic>>?)?.docs ?? [];
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
 
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8.0,
-        mainAxisSpacing: 8.0,
+                // Perform a null check before accessing docs
+                var products = (snapshot.data as QuerySnapshot<Map<String, dynamic>>?)?.docs ?? [];
+
+                return Column(
+                  children: products.map((product) {
+                    var productData = product.data();
+                    return ListTile(
+                      title: Text(productData?['name'] ?? ''),
+                      subtitle: Text(productData?['description'] ?? ''),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(productData?['image'] ?? ''),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailsPage(product: productData),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
+        ),
       ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        var product = products[index];
-        return Card(
-          child: Column(
-            children: [
-              Text(product['name']),
-              Text('Price: ${product['price']}'),
-              // Add other relevant product information here
-            ],
-          ),
-        );
-      },
     );
-  },
-),
+  }
+}
 
-        ],
+class ProductDetailsPage extends StatelessWidget {
+  final Map<String, dynamic>? product;
+
+  const ProductDetailsPage({Key? key, required this.product}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(product?['name'] ?? 'Product Details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Name: ${product?['name'] ?? ''}',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            Text('Description: ${product?['description'] ?? ''}'),
+            Text('Price: \$${product?['price'] ?? ''}'),
+            // Add other relevant product information here
+          ],
+        ),
       ),
     );
   }
