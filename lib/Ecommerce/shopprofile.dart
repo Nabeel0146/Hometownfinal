@@ -1,6 +1,4 @@
-
-
-
+import 'package:apptest/Ecommerce/editshopprofilepage.dart';  // Import the EditShopProfilePage
 import 'package:apptest/Ecommerce/productdetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +13,19 @@ class ShopProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shop Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {/*
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditShopProfilePage(shopId: shopId),
+                ),
+              );*/
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -33,9 +44,9 @@ class ShopProfilePage extends StatelessWidget {
                 }
 
                 // Perform a null check before accessing data
-                var shop = snapshot.data as DocumentSnapshot<Map<String, dynamic>>?;
+                var shop = snapshot.data;
                 if (shop == null || !shop.exists) {
-                  return Text('Shop not found');
+                  return const Text('Shop not found');
                 }
 
                 // Access shop data safely
@@ -48,7 +59,7 @@ class ShopProfilePage extends StatelessWidget {
                     children: [
                       Text(
                         'Shop Name: ${shopData?['name']}',
-                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                       ),
                       Text('Category: ${shopData?['category']}'),
                       // Add other relevant shop information here
@@ -59,8 +70,8 @@ class ShopProfilePage extends StatelessWidget {
             ),
 
             // Display Products List
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
               child: Text(
                 'Products',
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
@@ -79,7 +90,7 @@ class ShopProfilePage extends StatelessWidget {
                 }
 
                 // Perform a null check before accessing docs
-                var products = (snapshot.data as QuerySnapshot<Map<String, dynamic>>?)?.docs ?? [];
+                var products = (snapshot.data)?.docs ?? [];
 
                 return Column(
                   children: products.map((product) {

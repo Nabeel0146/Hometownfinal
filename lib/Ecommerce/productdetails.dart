@@ -19,7 +19,7 @@ class ProductDetailsPage extends StatelessWidget {
           children: [
             Text(
               'Name: ${product?['name'] ?? ''}',
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             Text('Description: ${product?['description'] ?? ''}'),
             Text('Price: \$${product?['price'] ?? ''}'),
