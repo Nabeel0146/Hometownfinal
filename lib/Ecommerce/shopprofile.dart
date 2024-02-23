@@ -1,4 +1,4 @@
-import 'package:apptest/Ecommerce/editshopprofilepage.dart';  // Import the EditShopProfilePage
+import 'package:apptest/Ecommerce/editshopprofilepage.dart';  
 import 'package:apptest/Ecommerce/productdetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +16,13 @@ class ShopProfilePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {/*
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditShopProfilePage(shopId: shopId),
+                  builder: (context) => EditShopProfilePage(shopId: shopId, ownerUid: ""),
                 ),
-              );*/
+              );
             },
           ),
         ],
@@ -31,7 +31,6 @@ class ShopProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Display Shop Information
             StreamBuilder(
               stream: FirebaseFirestore.instance.collection('shops').doc(shopId).snapshots(),
               builder: (context, snapshot) {
@@ -43,13 +42,11 @@ class ShopProfilePage extends StatelessWidget {
                   return Text('Error: ${snapshot.error}');
                 }
 
-                // Perform a null check before accessing data
                 var shop = snapshot.data;
                 if (shop == null || !shop.exists) {
                   return const Text('Shop not found');
                 }
 
-                // Access shop data safely
                 var shopData = shop.data();
 
                 return Padding(
@@ -62,14 +59,12 @@ class ShopProfilePage extends StatelessWidget {
                         style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                       ),
                       Text('Category: ${shopData?['category']}'),
-                      // Add other relevant shop information here
                     ],
                   ),
                 );
               },
             ),
 
-            // Display Products List
             const Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
@@ -89,7 +84,6 @@ class ShopProfilePage extends StatelessWidget {
                   return Text('Error: ${snapshot.error}');
                 }
 
-                // Perform a null check before accessing docs
                 var products = (snapshot.data)?.docs ?? [];
 
                 return Column(
