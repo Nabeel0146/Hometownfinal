@@ -1,6 +1,7 @@
-import 'package:apptest/Ecommerce/editshopprofilepage.dart';  
+import 'package:apptest/Ecommerce/editshopprofilepage.dart';
 import 'package:apptest/Ecommerce/productdetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ShopProfilePage extends StatelessWidget {
@@ -17,12 +18,7 @@ class ShopProfilePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditShopProfilePage(shopId: shopId, ownerUid: ""),
-                ),
-              );
+              _navigateToEditShopProfile(context);
             },
           ),
         ],
@@ -113,4 +109,57 @@ class ShopProfilePage extends StatelessWidget {
       ),
     );
   }
+
+  void _navigateToEditShopProfile(BuildContext context) async {
+  try {
+    // Get the currently logged-in user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Fetch the shop data
+      DocumentSnapshot shopSnapshot = await FirebaseFirestore.instance.collection('shops').doc(shopId).get();
+
+      if (shopSnapshot.exists) {
+        Map<String, dynamic> shopData = shopSnapshot.data() as Map<String, dynamic>;
+        String ownerUid = shopData['ownerUid'];
+
+        // Check if the current user is the owner
+        if (user.uid == ownerUid) {
+          // Navigate to EditShopProfilePage with shopId and ownerUid
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditShopProfilePage(
+                shopId: shopId,
+                ownerUid: ownerUid,
+              ),
+            ),
+          );
+        } else {
+          // Show an error message as the current user is not the owner
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text('You are not the owner of this shop. Cannot edit.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    } else {
+      // User is not logged in, handle accordingly (you might want to navigate to the login page)
+      print('User is not logged in.');
+    }
+  } catch (e) {
+    print('Error navigating to EditShopProfilePage: $e');
+  }
+}
 }

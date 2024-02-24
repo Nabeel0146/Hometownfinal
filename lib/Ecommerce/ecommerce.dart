@@ -11,6 +11,7 @@ class EcommercePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shops'),
+        automaticallyImplyLeading: false,
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('shops').snapshots(),

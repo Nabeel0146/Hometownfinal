@@ -54,7 +54,7 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Shop Profile'),
+        title: const Text('Edit Shop Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -63,30 +63,30 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
           children: [
             TextField(
               controller: _shopNameController,
-              decoration: InputDecoration(labelText: 'Shop Name'),
+              decoration: const InputDecoration(labelText: 'Shop Name'),
             ),
             TextField(
               controller: _categoryController,
-              decoration: InputDecoration(labelText: 'Category Name'),
+              decoration: const InputDecoration(labelText: 'Category Name'),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _cityController,
-              decoration: InputDecoration(labelText: 'City'),
+              decoration: const InputDecoration(labelText: 'City'),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _mobileNumberController,
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(labelText: 'Mobile Number'),
+              decoration: const InputDecoration(labelText: 'Mobile Number'),
             ),
-            SizedBox(height: 32.0),
+            const SizedBox(height: 32.0),
             TextField(
               controller: _imageUrlController,
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(labelText: 'Image URL'),
+              decoration: const InputDecoration(labelText: 'Image URL'),
             ),
-            SizedBox(height: 32.0),
+            const SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () {
                 // Check if the current user is the owner of the shop
@@ -99,21 +99,21 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Error'),
-                      content: Text('You are not the owner of this shop. Cannot edit.'),
+                      title: const Text('Error'),
+                      content: const Text('You are not the owner of this shop. Cannot edit.'),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: Text('OK'),
+                          child: const Text('OK'),
                         ),
                       ],
                     ),
                   );
                 }
               },
-              child: Text('Save Shop Profile'),
+              child: const Text('Save Shop Profile'),
             ),
           ],
         ),
