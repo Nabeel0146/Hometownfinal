@@ -1,10 +1,8 @@
 import 'package:apptest/Ecommerce/addshopprofilepage.dart';
 import 'package:apptest/Ecommerce/editshopprofilepage.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -20,8 +18,13 @@ class ProfilePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text('Profile'),
-            ),
+        backgroundColor: Colors.yellow,
+        automaticallyImplyLeading: false,
+        title: const Text('Profile'),
+        actions: const [
+          
+        ],
+      ),
             body: const Center(
               child: CircularProgressIndicator(),
             ),
@@ -29,8 +32,13 @@ class ProfilePage extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text('Profile'),
-            ),
+        backgroundColor: Colors.yellow,
+        automaticallyImplyLeading: false,
+        title: const Text('Profile'),
+        actions: const [
+          
+        ],
+      ),
             body: Center(
               child: Text('Error: ${snapshot.error}'),
             ),
@@ -46,20 +54,11 @@ class ProfilePage extends StatelessWidget {
   Widget buildProfileScreen(BuildContext context, bool hasShops, QuerySnapshot? snapshot) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.yellow,
+        automaticallyImplyLeading: false,
         title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditShopProfilePage(
-                  shopId: snapshot?.docs[0].id ?? '',
-                  ownerUid: FirebaseAuth.instance.currentUser?.uid ?? '',
-                )),
-              );
-            },
-          ),
+        actions: const [
+          
         ],
       ),
       body: Center(
@@ -106,12 +105,23 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
-               },
+                _signOut(context);
+              },
               child: const Text('Logout'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.popUntil(context, ModalRoute.withName('/')); // Navigate back to the root route
+    } catch (e) {
+      print('Error signing out: $e');
+      // Handle sign-out error
+    }
   }
 }

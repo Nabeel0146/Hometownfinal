@@ -1,34 +1,81 @@
-import 'package:apptest/Ecommerce/editshopprofilepage.dart';
-import 'package:apptest/Ecommerce/productdetails.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ShopProfilePage extends StatelessWidget {
+import 'package:url_launcher/url_launcher.dart';
+
+class ShopProfilePage extends StatefulWidget {
   final String shopId;
 
   const ShopProfilePage({Key? key, required this.shopId}) : super(key: key);
 
   @override
+  _ShopProfilePageState createState() => _ShopProfilePageState();
+}
+
+class _ShopProfilePageState extends State<ShopProfilePage> {
+  List<Map<String, dynamic>> cartItems = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('Shop Profile'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              _navigateToEditShopProfile(context);
+              _openCartDrawer();
             },
           ),
         ],
+      ),
+      endDrawer: Drawer(
+        // Use endDrawer instead of drawer for right-side placement
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Cart',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            for (var item in cartItems)
+              ListTile(
+                title: Text(item['name'] ?? ''),
+                subtitle: Text('Price: \$${item['price'] ?? ''}'),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  _placeOrder();
+                },
+                child: const Text('Place Order'),
+              ),
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('shops').doc(shopId).snapshots(),
+              stream: FirebaseFirestore.instance.collection('shops').doc(widget.shopId).snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -50,11 +97,39 @@ class ShopProfilePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: NetworkImage(shopData?['imageUrl'] ?? ''),
+                      ),
+                      const SizedBox(height: 16.0),
                       Text(
                         'Shop Name: ${shopData?['name']}',
                         style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                       ),
                       Text('Category: ${shopData?['category']}'),
+                      Text('Mobile Number: ${shopData?['mobileNumber']}'),
+                      const SizedBox(height: 16.0),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _launchPhoneCall(shopData?['mobileNumber']);
+                              },
+                              child: const Text('Call'),
+                            ),
+                          ),
+                          const SizedBox(width: 16.0),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _launchWhatsApp(shopData?['mobileNumber'], 'Hello from your customer!');
+                              },
+                              child: const Text('WhatsApp'),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 );
@@ -70,7 +145,7 @@ class ShopProfilePage extends StatelessWidget {
             ),
 
             StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('products').where('shopId', isEqualTo: shopId).snapshots(),
+              stream: FirebaseFirestore.instance.collection('products').where('shopId', isEqualTo: widget.shopId).snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -87,18 +162,22 @@ class ShopProfilePage extends StatelessWidget {
                     var productData = product.data();
                     return ListTile(
                       title: Text(productData['name'] ?? ''),
-                      subtitle: Text(productData['description'] ?? ''),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(productData['description'] ?? ''),
+                          Text('Price: \$${productData['price'] ?? ''}'),
+                        ],
+                      ),
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(productData['image'] ?? ''),
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetailsPage(product: productData),
-                          ),
-                        );
-                      },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.shopping_cart),
+                        onPressed: () {
+                          _addToCart(productData);
+                        },
+                      ),
                     );
                   }).toList(),
                 );
@@ -110,56 +189,62 @@ class ShopProfilePage extends StatelessWidget {
     );
   }
 
-  void _navigateToEditShopProfile(BuildContext context) async {
-    try {
-      // Get the currently logged-in user
-      User? user = FirebaseAuth.instance.currentUser;
+  void _addToCart(Map<String, dynamic> product) {
+    setState(() {
+      cartItems.add({
+        'name': product['name'],
+        'price': product['price'],
+      });
+    });
 
-      if (user != null) {
-        // Fetch the shop data
-        DocumentSnapshot shopSnapshot = await FirebaseFirestore.instance.collection('shops').doc(shopId).get();
+    
+  }
 
-        if (shopSnapshot.exists) {
-          Map<String, dynamic> shopData = shopSnapshot.data() as Map<String, dynamic>;
-          String ownerUid = shopData['ownerUid'];
 
-          // Check if the current user is the owner
-          if (user.uid == ownerUid) {
-            // Navigate to EditShopProfilePage with shopId and ownerUid
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditShopProfilePage(
-                  shopId: shopId,
-                  ownerUid: ownerUid,
-                ),
-              ),
-            );
-          } else {
-            // Show an error message as the current user is not the owner
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Error'),
-                content: const Text('You are not the owner of this shop. Cannot edit.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          }
-        }
-      } else {
-        // User is not logged in, handle accordingly (you might want to navigate to the login page)
-        print('User is not logged in.');
-      }
-    } catch (e) {
-      print('Error navigating to EditShopProfilePage: $e');
+
+  void _placeOrder() {
+    double totalPrice = 0;
+    for (var item in cartItems) {
+      totalPrice += (item['price'] ?? 0);
     }
+
+    FirebaseFirestore.instance.collection('shops').doc(widget.shopId).get().then((shopSnapshot) {
+      if (shopSnapshot.exists) {
+        String whatsappNumber = shopSnapshot.data()?['mobileNumber'] ?? '';
+        String orderMessage = 'Order Details:\n\n';
+        for (var item in cartItems) {
+          orderMessage += '${item['name']} - \$${item['price']}\n';
+        }
+        orderMessage += '\nTotal Price: \$${totalPrice.toStringAsFixed(2)}';
+
+        _launchWhatsApp(whatsappNumber, orderMessage);
+      }
+    });
+  }
+
+  void _launchPhoneCall(String? phoneNumber) async {
+    if (phoneNumber != null && phoneNumber.isNotEmpty) {
+      String url = 'tel:$phoneNumber';
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        print('Could not launch phone call.');
+      }
+    }
+  }
+
+  void _launchWhatsApp(String? phoneNumber, String message) async {
+    if (phoneNumber != null && phoneNumber.isNotEmpty) {
+      String url = 'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}';
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        print('Could not launch WhatsApp.');
+      }
+    }
+  }
+
+  void _openCartDrawer() {
+    _scaffoldKey.currentState?.openEndDrawer();
   }
 }

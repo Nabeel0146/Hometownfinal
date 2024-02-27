@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +19,7 @@ class _AddShopProfilePageState extends State<AddShopProfilePage> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _mobileNumberController = TextEditingController();
   final TextEditingController _imageUrlController = TextEditingController();
+  final TextEditingController _shopDescriptionController = TextEditingController();
   XFile? _pickedImage;
 
   // Product details controllers
@@ -61,9 +61,13 @@ class _AddShopProfilePageState extends State<AddShopProfilePage> {
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(labelText: 'Mobile Number'),
               ),
-              const SizedBox(height: 32.0),
-              
               const SizedBox(height: 16.0),
+              TextField(
+                controller: _shopDescriptionController,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Shop Description'),
+              ),
+              const SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed: () async {
                   await _pickImage();
@@ -193,11 +197,10 @@ class _AddShopProfilePageState extends State<AddShopProfilePage> {
       String category = _categoryController.text;
       String city = _cityController.text;
       String mobileNumber = _mobileNumberController.text;
+      String shopDescription = _shopDescriptionController.text;
 
       // Get the current user's UID
       String? ownerUid = FirebaseAuth.instance.currentUser?.uid;
-
-      // Validate inputs (you can add more sophisticated validation as needed)
 
       // Save the shop profile to Firestore
       await FirebaseFirestore.instance.collection('shops').doc(shopId).set({
@@ -206,6 +209,7 @@ class _AddShopProfilePageState extends State<AddShopProfilePage> {
         'mobileNumber': mobileNumber,
         'category': category,
         'ownerUid': ownerUid,
+        'description': shopDescription, // Added description field
       });
 
       // Upload the shop image to Firebase Storage

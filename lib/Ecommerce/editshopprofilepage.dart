@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EditShopProfilePage extends StatefulWidget {
   final String shopId;
@@ -21,13 +25,12 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _mobileNumberController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
+  final TextEditingController _shopDescriptionController = TextEditingController();
   final List<ProductEntry> _productEntries = [];
 
   @override
   void initState() {
     super.initState();
-    // Load the existing shop profile data and products when the page is initialized
     loadShopProfileData();
     loadProducts();
   }
@@ -43,7 +46,7 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
         _categoryController.text = data['category'] ?? '';
         _cityController.text = data['city'] ?? '';
         _mobileNumberController.text = data['mobileNumber'] ?? '';
-        _imageUrlController.text = data['imageUrl'] ?? '';
+        _shopDescriptionController.text = data['description'] ?? '';
       }
     } catch (e) {
       print('Error loading shop profile data: $e');
@@ -52,17 +55,22 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
 
   Future<void> loadProducts() async {
     try {
-      QuerySnapshot productsSnapshot = await FirebaseFirestore.instance
-          .collection('products')
+      CollectionReference productsCollection =
+          FirebaseFirestore.instance.collection('products');
+
+      // Use snapshots() to get real-time updates
+      productsCollection
           .where('shopId', isEqualTo: widget.shopId)
-          .get();
+          .snapshots()
+          .listen((QuerySnapshot productsSnapshot) {
+        List<ProductEntry> products = productsSnapshot.docs
+            .map((doc) => ProductEntry.fromSnapshot(doc))
+            .toList();
 
-      List<ProductEntry> products = productsSnapshot.docs
-          .map((doc) => ProductEntry.fromSnapshot(doc))
-          .toList();
-
-      setState(() {
-        _productEntries.addAll(products);
+        setState(() {
+          _productEntries.clear();
+          _productEntries.addAll(products);
+        });
       });
     } catch (e) {
       print('Error loading products: $e');
@@ -73,11 +81,9 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: ElevatedButton(
-        
-        onPressed: 
-                 _addProductEntry,
-                child: const Text('Add Product'),
-              ),
+        onPressed: _addProductEntry,
+        child: const Text('Add Product'),
+      ),
       appBar: AppBar(
         title: const Text('Edit Shop Profile'),
       ),
@@ -106,22 +112,20 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(labelText: 'Mobile Number'),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 16.0),
               TextField(
-                controller: _imageUrlController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(labelText: 'Image URL'),
+                controller: _shopDescriptionController,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Shop Description'),
               ),
+              
               const SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed: () {
-                  // Check if the current user is the owner of the shop
                   String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
                   if (currentUserUid == widget.ownerUid) {
-                    // Current user is the owner, allow editing
                     _updateShopProfile();
                   } else {
-                    // Show an error message as the current user is not the owner
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -142,7 +146,6 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
                 child: const Text('Save Shop Profile'),
               ),
               const SizedBox(height: 16.0),
-              
               const Text(
                 'Products',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -161,7 +164,6 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
                 },
               ),
               const SizedBox(height: 16.0),
-              
             ],
           ),
         ),
@@ -171,7 +173,6 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
 
   Widget _buildProductGridItem(ProductEntry product) {
     return Container(
-      
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -190,7 +191,6 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
                 const SizedBox(height: 8.0),
                 Text('\$${product.getPrice()}'),
                 const SizedBox(height: 8.0),
-                
                 ElevatedButton(
                   onPressed: () => _editProductDetails(product),
                   child: const Text('Edit'),
@@ -204,127 +204,152 @@ class _EditShopProfilePageState extends State<EditShopProfilePage> {
     );
   }
 
-  // Method to edit product details in a popup
-  // Method to edit product details in a popup
-void _editProductDetails(ProductEntry product) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Edit Product'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: product._productNameController,
-            decoration: const InputDecoration(labelText: 'Product Name'),
+  void _editProductDetails(ProductEntry product) {
+    TextEditingController productNameController = TextEditingController();
+    TextEditingController productPriceController = TextEditingController();
+    TextEditingController productDescriptionController = TextEditingController();
+
+    productNameController.text = product.getName();
+    productPriceController.text = product.getPrice().toString();
+    productDescriptionController.text = product.getDescription();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Product'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: productNameController,
+              decoration: const InputDecoration(labelText: 'Product Name'),
+            ),
+            TextField(
+              controller: productPriceController,
+              decoration: const InputDecoration(labelText: 'Product Price'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: productDescriptionController,
+              decoration: const InputDecoration(labelText: 'Product Description'),
+            ),
+            ElevatedButton(
+              onPressed: () => _pickImage(product),
+              child: const Text('Pick Image'),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
           ),
-          TextField(
-            controller: product._productPriceController,
-            decoration: const InputDecoration(labelText: 'Product Price'),
-            keyboardType: TextInputType.number,
-          ),
-          TextField(
-            controller: product._productDescriptionController,
-            decoration: const InputDecoration(labelText: 'Product Description'),
-          ),
-          TextField(
-            controller: product._productImageController,
-            decoration: const InputDecoration(labelText: 'Product Image URL'),
+          TextButton(
+            onPressed: () {
+              product.setName(productNameController.text);
+              product.setPrice(double.parse(productPriceController.text));
+              product.setDescription(productDescriptionController.text);
+
+              product.saveOrUpdateProduct(widget.shopId, productId: product.productId);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            // Save the edited product details directly to Firestore
-            product.saveOrUpdateProduct(widget.shopId);
-            Navigator.of(context).pop();
-          },
-          child: const Text('Save'),
-        ),
-      ],
-    ),
-  );
-}
-
+    );
+  }
 
   void _addProductEntry() {
-  setState(() {
-    _productEntries.add(ProductEntry());
-  });
+    setState(() {
+      _productEntries.add(ProductEntry());
+    });
 
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Add Product'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _productEntries.last._productNameController,
-            decoration: const InputDecoration(labelText: 'Product Name'),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Product'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _productEntries.last._productNameController,
+              decoration: const InputDecoration(labelText: 'Product Name'),
+            ),
+            TextField(
+              controller: _productEntries.last._productPriceController,
+              decoration: const InputDecoration(labelText: 'Product Price'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _productEntries.last._productDescriptionController,
+              decoration: const InputDecoration(labelText: 'Product Description'),
+            ),
+            ElevatedButton(
+              onPressed: () => _pickImage(_productEntries.last),
+              child: const Text('Pick Image'),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
           ),
-          TextField(
-            controller: _productEntries.last._productPriceController,
-            decoration: const InputDecoration(labelText: 'Product Price'),
-            keyboardType: TextInputType.number,
-          ),
-          TextField(
-            controller: _productEntries.last._productDescriptionController,
-            decoration: const InputDecoration(labelText: 'Product Description'),
-          ),
-          TextField(
-            controller: _productEntries.last._productImageController,
-            decoration: const InputDecoration(labelText: 'Product Image URL'),
+          TextButton(
+            onPressed: () {
+              _productEntries.last.saveOrUpdateProduct(widget.shopId);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            // Save the new product details
-            _productEntries.last.saveOrUpdateProduct(widget.shopId);
-            Navigator.of(context).pop();
-          },
-          child: const Text('Save'),
-        ),
-      ],
-    ),
-  );
+    );
+  }
+
+  Future<void> _pickImage(ProductEntry product) async {
+  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null) {
+    File imageFile = File(pickedFile.path);
+    String imageName = DateTime.now().millisecondsSinceEpoch.toString();
+    Reference storageReference = FirebaseStorage.instance.ref().child('product_images/$imageName.jpg');
+    
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    await uploadTask.whenComplete(() async {
+      String imageUrl = await storageReference.getDownloadURL();
+      product.setImageUrl(imageUrl);
+    });
+
+    // Update UI to show the picked image
+    setState(() {
+      // Assuming you have a method in ProductEntry to set the image URL
+      product.setImageUrl(product.getImageUrl());
+    });
+  } else {
+    print('No image selected.');
+  }
 }
-//above is the pop up that ask the product detailsssssssss
 
 
   void _updateShopProfile() async {
-    // Validate inputs if needed
-
-    // Update the shop profile in Firestore
     await FirebaseFirestore.instance.collection('shops').doc(widget.shopId).update({
       'name': _shopNameController.text,
       'city': _cityController.text,
       'mobileNumber': _mobileNumberController.text,
       'category': _categoryController.text,
-      'imageUrl': _imageUrlController.text,
+      'description': _shopDescriptionController.text,
     });
 
-    // Save or update each product entry in Firestore
     for (var entry in _productEntries) {
-      await entry.saveOrUpdateProduct(widget.shopId);
+      await entry.saveOrUpdateProduct(widget.shopId, productId: entry.productId);
     }
 
-    // Navigate back to the previous page
     Navigator.pop(context);
   }
 }
@@ -333,18 +358,18 @@ class ProductEntry {
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productPriceController = TextEditingController();
   final TextEditingController _productDescriptionController = TextEditingController();
-  final TextEditingController _productImageController = TextEditingController();
+  String _imageUrl = '';
+  String? productId;
 
-  // Default constructor
   ProductEntry();
 
   Widget buildProductEntry(BuildContext context) {
     return Column(
       children: [
         Image.network(
-          _productImageController.text,
-          width: 100, // Adjust the width as needed
-          height: 100, // Adjust the height as needed
+          _imageUrl,
+          width: 100,
+          height: 100,
         ),
         TextField(
           controller: _productNameController,
@@ -364,33 +389,54 @@ class ProductEntry {
     );
   }
 
-  Future<void> saveOrUpdateProduct(String shopId) async {
+  Future<void> saveOrUpdateProduct(String shopId, {String? productId}) async {
     try {
-      // Validate inputs if needed
-
-      // Add or update the product in the "products" collection in Firestore
-      await FirebaseFirestore.instance.collection('products').add({
+      Map<String, dynamic> productData = {
         'name': _productNameController.text,
         'price': double.parse(_productPriceController.text),
         'description': _productDescriptionController.text,
-        'image': _productImageController.text,
+        'image': _imageUrl,
         'shopId': shopId,
-      });
+      };
+
+      if (productId != null) {
+        await FirebaseFirestore.instance.collection('products').doc(productId).update(productData);
+      } else {
+        DocumentReference docRef = await FirebaseFirestore.instance.collection('products').add(productData);
+        this.productId = docRef.id;
+      }
     } catch (e) {
       print('Error adding/updating product: $e');
     }
   }
 
-  // Constructor to create ProductEntry from Firestore snapshot
   ProductEntry.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     _productNameController.text = data['name'] ?? '';
     _productPriceController.text = data['price'].toString() ?? '';
     _productDescriptionController.text = data['description'] ?? '';
-    _productImageController.text = data['image'] ?? '';
+    _imageUrl = data['image'] ?? '';
+    productId = snapshot.id;
   }
 
   String getName() => _productNameController.text;
   double getPrice() => double.parse(_productPriceController.text);
-  String getImageUrl() => _productImageController.text;
+  String getDescription() => _productDescriptionController.text;
+  String getImageUrl() => _imageUrl;
+
+  void setName(String name) {
+    _productNameController.text = name;
+  }
+
+  void setPrice(double price) {
+    _productPriceController.text = price.toString();
+  }
+
+  void setDescription(String description) {
+    _productDescriptionController.text = description;
+  }
+
+  void setImageUrl(String imageUrl) {
+    _imageUrl = imageUrl;
+  }
 }

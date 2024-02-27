@@ -1,24 +1,27 @@
 import 'package:apptest/Ecommerce/ecommerce.dart';
-import 'package:apptest/Social%20Media/socialmedia.dart';
 import 'package:apptest/firebase_options.dart';
 import 'package:apptest/homepage.dart';
-import 'package:apptest/profile/profile.dart';
-import 'package:apptest/profile/signuppage.dart';
-import 'package:apptest/servicess/Services/servicespage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:apptest/Ecommerce/shopprofile.dart';
+import 'package:apptest/Social%20Media/socialmedia.dart';
+import 'package:apptest/profile/signuppage.dart';
+import 'package:apptest/servicess/Services/servicespage.dart';
+import 'package:apptest/Ecommerce/categoryshops.dart';
+import 'package:apptest/profile/profile.dart';
 
 
 
 Future<void> main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
+  runApp(MyApp()); // Remove 'const' from here
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +30,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SignupPage(), //hiaded
+      home: const SignupPage(),
     );
   }
 }
 
 
 
+
+
+
+
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.userUid}) : super(key: key);
+  MyHomePage({Key? key, required this.userUid}) : super(key: key);
   final String userUid;
 
   @override
@@ -45,6 +52,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
+
+  // Example list of categories
+  List<String> categories = ['Electronics', 'Clothing', 'Books', 'Home Decor'];
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +80,10 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentIndex = index;
           });
         },
-        children: const [
+        children: [
           SocialMediaPage(),
-          Servicespage(),
-          RealHomePage(),
+          ServiceCategoriesPage(),
+          CategoryListPage(), // Pass the categories here
           EcommercePage(),
           ProfilePage(),
         ],
@@ -91,39 +101,30 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.group),
             label: 'Social Media',
-            backgroundColor: Colors.black
+            backgroundColor: Colors.black,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.build),
             label: 'Services',
-            backgroundColor: Colors.black
+            backgroundColor: Colors.black,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-            backgroundColor: Colors.black
+            backgroundColor: Colors.black,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Ecommerce',
-            backgroundColor: Colors.black
+            backgroundColor: Colors.black,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
-            backgroundColor: Colors.black
+            backgroundColor: Colors.black,
           ),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-
-
-
