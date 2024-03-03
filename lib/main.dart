@@ -1,16 +1,12 @@
 import 'package:apptest/Ecommerce/ecommerce.dart';
+import 'package:apptest/Social%20Media/socialmedia.dart';
 import 'package:apptest/firebase_options.dart';
 import 'package:apptest/homepage.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:apptest/Ecommerce/shopprofile.dart';
-import 'package:apptest/Social%20Media/socialmedia.dart';
+import 'package:apptest/profile/profile.dart';
 import 'package:apptest/profile/signuppage.dart';
 import 'package:apptest/servicess/Services/servicespage.dart';
-import 'package:apptest/Ecommerce/categoryshops.dart';
-import 'package:apptest/profile/profile.dart';
-
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,15 +31,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
-
-
-
-
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.userUid}) : super(key: key);
   final String userUid;
+  final String selectedCity;
+
+  MyHomePage({Key? key, required this.userUid, required this.selectedCity})
+      : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -81,10 +74,10 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
         children: [
-          SocialMediaPage(),
-          ServiceCategoriesPage(),
+          Socialmedia(),
+          ServiceCategoriesPage(selectedCity: widget.selectedCity,),
           CategoryListPage(), // Pass the categories here
-          EcommercePage(),
+          EcommercePage(selectedCity: widget.selectedCity), // Pass selectedCity here
           ProfilePage(),
         ],
       ),
