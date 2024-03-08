@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
       toolbarHeight: 30,
         backgroundColor: Color.fromARGB(255, 220, 119, 119),
-        title: Text('Local media of $selectedCity city', style: TextStyle(fontWeight: FontWeight.bold,),),
+        title: Text('Local media of $selectedCity city', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),),
       ),
       body: isCreatingPost
           ? _buildCreatePostPage(context)

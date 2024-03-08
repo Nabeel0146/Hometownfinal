@@ -21,11 +21,13 @@ class ServiceCategoriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Service Categories'),
+        toolbarHeight: 30,
+        backgroundColor: const Color.fromARGB(255, 172, 218, 255),
+        title: Text('Services Nearby', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
         automaticallyImplyLeading: false, // Remove back button
       ),
       body: Container(
-        color: Colors.grey[200], // Set the background color of the screen
+        color: Color.fromARGB(255, 252, 252, 252), // Set the background color of the screen
         child: FutureBuilder<List<ServiceCategoryModel>>(
           future: fetchServiceCategories(),
           builder: (context, snapshot) {
@@ -61,23 +63,28 @@ class ServiceCategoriesPage extends StatelessWidget {
                       );
                     },
                     child: Card(
-                      child: Container(
-                        color: Colors.white, // Set the background color of the grid item
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Image.network(
-                                currentCategory.image,
-                                fit: BoxFit.cover,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                      child: ClipRRect(
+                         borderRadius: BorderRadius.circular(8.0),
+                        child: Container(
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Image.network(
+                                  currentCategory.image,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              currentCategory.title,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
+                              SizedBox(height: 8.0),
+                              Text(
+                                currentCategory.title,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

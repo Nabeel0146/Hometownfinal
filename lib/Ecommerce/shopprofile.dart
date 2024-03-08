@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 class ShopProfilePage extends StatefulWidget {
@@ -38,7 +37,6 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
         ],
       ),
       endDrawer: Drawer(
-        // Use endDrawer instead of drawer for right-side placement
         child: ListView(
           children: [
             const DrawerHeader(
@@ -138,9 +136,11 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
 
             const Padding(
               padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Products',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              child: Center(
+                child: Text(
+                  'Products',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
 
@@ -157,30 +157,66 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
 
                 var products = (snapshot.data)?.docs ?? [];
 
-                return Column(
-                  children: products.map((product) {
-                    var productData = product.data();
-                    return ListTile(
-                      title: Text(productData['name'] ?? ''),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(productData['description'] ?? ''),
-                          Text('Price: \$${productData['price'] ?? ''}'),
-                        ],
-                      ),
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(productData['image'] ?? ''),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.shopping_cart),
-                        onPressed: () {
-                          _addToCart(productData);
-                        },
-                      ),
-                    );
-                  }).toList(),
-                );
+                return GridView.builder(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    crossAxisSpacing: 8.0,
+    mainAxisSpacing: 8.0,
+    mainAxisExtent: 250,
+  ),
+  shrinkWrap: true,
+  physics: NeverScrollableScrollPhysics(),
+  itemCount: products.length,
+  itemBuilder: (context, index) {
+    var productData = products[index].data();
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 10,),
+          CircleAvatar(
+            radius: 40,
+            backgroundImage: NetworkImage(productData['image'] ?? ''),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(productData['name'] ?? '', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),),
+                Text(productData['description'] ?? ''),
+                Text('Price: \$${productData['price'] ?? ''}'),
+              ],
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.green),
+            width: 140,
+            height: 40,
+            
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _addToCart(productData);
+                  },
+                  child: Text("Add to cart",)),
+                IconButton(
+                  icon: const Icon(Icons.shopping_cart),
+                  onPressed: () {
+                    _addToCart(productData);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  },
+)
+;
               },
             ),
           ],
@@ -196,11 +232,7 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
         'price': product['price'],
       });
     });
-
-    
   }
-
-
 
   void _placeOrder() {
     double totalPrice = 0;

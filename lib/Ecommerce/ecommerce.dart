@@ -39,7 +39,7 @@ class _EcommercePageState extends State<EcommercePage> {
       appBar: AppBar(
         toolbarHeight: 30,
         backgroundColor: Color.fromARGB(255, 252, 230, 143),
-        title: const Text('Shops'),
+        title: const Text('Shops Nearby', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),),
         automaticallyImplyLeading: false,
         actions: [
           // Dropdown for selecting city
